@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/simon/GitHub/cppGameEngine",
+            "binaryPath": "/home/simon/GitHub/cppGameEngine/gameengine",
+            "binaryArgs": []
+        }
+    ]
+}
