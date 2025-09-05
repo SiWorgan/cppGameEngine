@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include "Game.h"
 #include "spdlog/spdlog.h"
+#include "../ECS/ECS.h"
 
 Game::Game() {
     isRunning = false;
@@ -60,6 +61,10 @@ void Game::ProcessInput() {
 }
 
 void Game::Setup() {
+    // Entity tank = registry.CreateEntity();
+    // tank.AddComponent<TransformComponent>();
+    // tank.AddComponent<BoxColliderComponent>();
+    // tank.AddComponent<SpriteComponent>("./assets/images/tank.png")
     playerPosition = glm::vec2(10.0, 20.0);
     playerVelocity = glm::vec2(20, 1.0);
     SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
@@ -86,7 +91,11 @@ void Game::Update() {
     millisecsPreviousFrame = SDL_GetTicks(); 
 
     playerPosition.x += playerVelocity.x * deltaTime; 
-    playerPosition.y += playerVelocity.y * deltaTime; 
+    playerPosition.y += playerVelocity.y * deltaTime;
+    
+    // MovementSystem.Update();
+    // CollisionSystem.Update();
+    // DamageSystem.Update();
 
 }
 
@@ -94,10 +103,6 @@ void Game::Render() {
     // Background
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
-
-    //spdlog::info(playerPosition.x);
-    //spdlog::info(playerPosition.y);
-
 
     SDL_Rect dstRect = {
         static_cast<int>(playerPosition.x), 
