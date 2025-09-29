@@ -5,9 +5,13 @@
 #include "Game.h"
 #include "spdlog/spdlog.h"
 #include "../ECS/ECS.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Systems/MovementSystem.h"
 
 Game::Game() {
     isRunning = false;
+    registry = std::make_unique<Registry>();
     spdlog::info("Constructor called");
 }
 
@@ -61,22 +65,16 @@ void Game::ProcessInput() {
 }
 
 void Game::Setup() {
-    // Entity tank = registry.CreateEntity();
-    // tank.AddComponent<TransformComponent>();
-    // tank.AddComponent<BoxColliderComponent>();
-    // tank.AddComponent<SpriteComponent>("./assets/images/tank.png")
-    playerPosition = glm::vec2(10.0, 20.0);
-    playerVelocity = glm::vec2(20, 1.0);
-    SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
-    if (surface) {
-        tankTexture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-        if (!tankTexture) {
-            spdlog::error("Failed to create tank texture: {}", SDL_GetError());
-        }
-    } else {
-        spdlog::error("Failed to load tank image: {}", IMG_GetError());
-    }
+    //Add the systems that need to be processed in our game
+    registry->AddSystem<MovementSystem>();
+
+
+    //Create Entity
+    Entity tank = registry->CreateEntity();
+
+    //Add some components
+    tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0,1.0), 0.0);
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0));
 }
 
 void Game::Update() {
@@ -90,29 +88,20 @@ void Game::Update() {
 
     millisecsPreviousFrame = SDL_GetTicks(); 
 
-    playerPosition.x += playerVelocity.x * deltaTime; 
-    playerPosition.y += playerVelocity.y * deltaTime;
-    
-    // MovementSystem.Update();
+    registry->GetSystem<MovementSystem>().Update();
     // CollisionSystem.Update();
     // DamageSystem.Update();
 
 }
 
 void Game::Render() {
+
     // Background
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
-    SDL_Rect dstRect = {
-        static_cast<int>(playerPosition.x), 
-        static_cast<int>(playerPosition.y), 
-        32, 
-        32
-    };
-    SDL_RenderCopy(renderer, tankTexture, NULL, &dstRect);
-
     SDL_RenderPresent(renderer);
+
 }
 
 void Game::Run() {
@@ -125,8 +114,6 @@ void Game::Run() {
 }
 
 void Game::Destroy() {
-    if (tankTexture) SDL_DestroyTexture(tankTexture);
-    IMG_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
