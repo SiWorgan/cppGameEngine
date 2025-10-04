@@ -103,7 +103,13 @@ class Registry {
 
 
     public:
-        Registry() = default;
+        Registry() {
+            spdlog::info("Registry constructor called");
+        }
+
+        ~Registry() {
+            spdlog::info("Registry destructor called");
+        }
 
         Entity CreateEntity();
         void Update();

@@ -4,6 +4,7 @@
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "spdlog/spdlog.h"
 
 class MovementSystem: public System {
 
@@ -13,14 +14,14 @@ class MovementSystem: public System {
             RequireComponent<RigidBodyComponent>();
         }
 
-        void Update() {
-            // TODO: Update entity position based on its velocity
+        void Update(double deltaTime) {
+            // TODO: Move to cpp 
             for (auto entity: GetSystemEntities()) {
                 TransformComponent& transform = entity.GetComponent<TransformComponent>();
                 const RigidBodyComponent rigidbody = entity.GetComponent<RigidBodyComponent>();
 
-                transform.position.x += rigidbody.velocity.x;
-                transform.position.y += rigidbody.velocity.y;
+                transform.position.x += rigidbody.velocity.x * deltaTime;
+                transform.position.y += rigidbody.velocity.y * deltaTime;
 
             }
         }
