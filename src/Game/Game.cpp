@@ -73,7 +73,7 @@ void Game::Setup() {
     registry->AddSystem<RenderSystem>();
 
     //Addint assets to the asset store
-    assetStore->AddTexture(renderer, "take-image", "./assets/images/tank-panther-right.png");
+    assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
 
 
@@ -81,9 +81,9 @@ void Game::Setup() {
     Entity tank = registry->CreateEntity();
 
     //Add some components
-    tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0,1.0), 0.0);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0));
-    tank.AddComponent<SpriteComponent>("tank-image", 10, 10);
+    tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0));
+    tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
 }
 
 void Game::Update() {
@@ -112,7 +112,7 @@ void Game::Render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
     
-    registry->GetSystem<RenderSystem>().Update(renderer);
+    registry->GetSystem<RenderSystem>().Update(renderer, *assetStore);
 
     SDL_RenderPresent(renderer);
 
