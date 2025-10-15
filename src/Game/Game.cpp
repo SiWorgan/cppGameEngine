@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
@@ -67,15 +68,42 @@ void Game::ProcessInput() {
     }
 }
 
-void Game::Setup() {
+void Game::LoadLevel(int level) {
     //Add the systems that need to be processed in our game
     registry->AddSystem<MovementSystem>();
     registry->AddSystem<RenderSystem>();
 
-    //Addint assets to the asset store
+    //Add assets to the asset store
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
 
+    //Add tilemap to the asset store
+    assetStore->AddTexture(renderer, "jungle-map", "./assets/tilemaps/jungle.png");
+
+    // Load the tilemap
+    int tileSize = 32;
+    double tileScale = 1.0;
+    int mapNumCols = 25;
+    int mapNumRows = 20;
+
+    std::fstream mapFile;
+    mapFile.open("./assets/tilemaps/jungle.map");
+
+    for (int y = 0; y < mapNumRows; y++) {
+        for (int x = 0; x < mapNumCols; x++) {
+            char ch;
+            mapFile.get(ch);
+            int srcRectY = std::atoi(&ch) * tileSize;
+            mapFile.get(ch);
+            int srcRectX = std::atoi(&ch) * tileSize;
+            mapFile.ignore();
+
+            Entity tile = registry->CreateEntity();
+            tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale));
+            tile.AddComponent<SpriteComponent>("jungle-map", tileSize, tileSize, srcRectX, srcRectY);
+        }
+    }
+    mapFile.close();
 
     //Create Entity
     Entity tank = registry->CreateEntity();
@@ -84,6 +112,10 @@ void Game::Setup() {
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0));
     tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
+}
+
+void Game::Setup() {
+    LoadLevel(1);
 }
 
 void Game::Update() {
