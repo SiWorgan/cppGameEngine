@@ -5,12 +5,14 @@
 #include <glm/glm.hpp>
 #include "Game.h"
 #include "spdlog/spdlog.h"
+
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../Utilities/TileMapLoader.h"
 
 Game::Game() {
     isRunning = false;
@@ -79,31 +81,7 @@ void Game::LoadLevel(int level) {
 
     //Add tilemap to the asset store
     assetStore->AddTexture(renderer, "jungle-map", "./assets/tilemaps/jungle.png");
-
-    // Load the tilemap
-    int tileSize = 32;
-    double tileScale = 1.0;
-    int mapNumCols = 25;
-    int mapNumRows = 20;
-
-    std::fstream mapFile;
-    mapFile.open("./assets/tilemaps/jungle.map");
-
-    for (int y = 0; y < mapNumRows; y++) {
-        for (int x = 0; x < mapNumCols; x++) {
-            char ch;
-            mapFile.get(ch);
-            int srcRectY = std::atoi(&ch) * tileSize;
-            mapFile.get(ch);
-            int srcRectX = std::atoi(&ch) * tileSize;
-            mapFile.ignore();
-
-            Entity tile = registry->CreateEntity();
-            tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale));
-            tile.AddComponent<SpriteComponent>("jungle-map", tileSize, tileSize, srcRectX, srcRectY);
-        }
-    }
-    mapFile.close();
+    TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", 25, 25, 32, 4.0f, registry.get(), assetStore.get());
 
     //Create Entity
     Entity tank = registry->CreateEntity();
