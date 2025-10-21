@@ -29,7 +29,7 @@ void TileMapLoader::LoadMap(const std::string& path, int mapNumRows, int mapNumC
                 glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)),
                 glm::vec2(tileScale, tileScale)
             );
-            tile.AddComponent<SpriteComponent>("jungle-map", tileSize, tileSize, srcRectX, srcRectY);
+            tile.AddComponent<SpriteComponent>("jungle-map", tileSize, tileSize,  0, srcRectX, srcRectY);
         }
     }
 }

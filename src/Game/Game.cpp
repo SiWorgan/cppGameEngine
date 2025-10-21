@@ -79,17 +79,18 @@ void Game::LoadLevel(int level) {
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
 
-    //Add tilemap to the asset store
-    assetStore->AddTexture(renderer, "jungle-map", "./assets/tilemaps/jungle.png");
-    TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", 25, 25, 32, 4.0f, registry.get(), assetStore.get());
-
     //Create Entity
     Entity tank = registry->CreateEntity();
 
     //Add some components
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0));
-    tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
+    tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
+    
+    //Add tilemap to the asset store
+    assetStore->AddTexture(renderer, "jungle-map", "./assets/tilemaps/jungle.png");
+    TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", 25, 25, 32, 4.0f, registry.get(), assetStore.get());
+
 }
 
 void Game::Setup() {

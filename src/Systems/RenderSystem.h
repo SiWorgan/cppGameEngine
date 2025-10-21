@@ -17,10 +17,26 @@ class RenderSystem: public System {
         }
 
         void Update(SDL_Renderer* renderer, AssetStore& assetStore) {
-            // TODO: Move to cpp 
+            // Sort by z-index - why not a map?
+            struct RenderableEntity {
+                TransformComponent transformComponent;
+                SpriteComponent spriteComponent;
+            };
+            std::vector<RenderableEntity> renderableEntities;
             for (auto entity: GetSystemEntities()) {
-                const TransformComponent& transform = entity.GetComponent<TransformComponent>();
-                const SpriteComponent& sprite = entity.GetComponent<SpriteComponent>();
+                RenderableEntity renderableEntity;
+                renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
+                renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
+                renderableEntities.emplace_back(renderableEntity);
+            }
+            std::sort(renderableEntities.begin(), renderableEntities.end(), [](const RenderableEntity& a, const RenderableEntity& b){
+                return a.spriteComponent.zIndex < b.spriteComponent.zIndex;
+            });
+
+            // TODO: Move to cpp 
+            for (auto entity: renderableEntities) {
+                const TransformComponent& transform = entity.transformComponent;
+                const SpriteComponent& sprite = entity.spriteComponent;
 
                 SDL_Rect srcRect = sprite.srcRect;
                 SDL_Rect dstRect = {
