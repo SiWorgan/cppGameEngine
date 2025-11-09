@@ -7,6 +7,7 @@
 #include <typeindex>
 #include <set>
 #include <memory>
+#include <deque>
 #include "Pool.h"
 #include "spdlog/spdlog.h"
 
@@ -43,6 +44,7 @@ class Entity {
     public:
         Entity(int id): id(id) {};
         Entity(const Entity& entity) = default; 
+        void Kill();
         int GetId() const;
 
         bool operator ==(const Entity& other) const { return id == other.id; }
@@ -101,6 +103,7 @@ class Registry {
         std::set<Entity> entitiesToBeAdded;
         std::set<Entity> entitiesToBeKilled;
 
+        std::deque<int> freeIds;
 
     public:
         Registry() {
@@ -112,6 +115,8 @@ class Registry {
         }
 
         Entity CreateEntity();
+
+        void KillEntity(Entity entity);
         void Update();
         void AddEntityToSystem(Entity entity);
 
@@ -127,8 +132,9 @@ class Registry {
         template <typename TSystem> bool HasSystem() const;
         template <typename TSystem> TSystem& GetSystem() const;
 
-        // Add entity to systems according to entity signature
+        // Add & remove entity from systems according to entity signature
         void AddEntityToSystems(Entity entity);
+        void RemoveEntityFromSystems(Entity entity);
 
         //TODO:
         //KillEntity();

@@ -119,7 +119,7 @@ void Game::LoadLevel(int level) {
     radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0));
     radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
     radar.AddComponent<AnimationComponent>(8, 5, true);
-    
+
     //Load the map
     TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", 25, 25, 32, 4.0f, registry.get(), assetStore.get());
 

@@ -30,7 +30,6 @@ class RenderCollisionSystem: public System {
                 };
                 
                 if (collider.colliding) {
-                    spdlog::info("Drawing Red");
                     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //Red
                 } else {
                     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); //Yellow
