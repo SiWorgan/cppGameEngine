@@ -2,7 +2,8 @@
 #define COLLISIONSYSTEM_H
 
 #include "spdlog/spdlog.h"
-
+#include "../EventBus/EventBus.h"
+#include "../Events/CollisionEvent.h"
 #include "../ECS/ECS.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TransformComponent.h"
@@ -14,11 +15,10 @@ class CollisionSystem: public System {
             RequireComponent<TransformComponent>();
         }
 
-        void Update() {
+        void Update(std::unique_ptr<EventBus>& eventBus) {
             auto entities = GetSystemEntities();
             for (auto entity : entities) {
                 auto& collider = entity.GetComponent<BoxColliderComponent>();
-                collider.colliding = false;
             }
 
             for (auto i = entities.begin(); i != entities.end(); i++) {
@@ -33,9 +33,8 @@ class CollisionSystem: public System {
                     bool collision = CheckAABBCollision(aTransform, aCollider, bTransform, bCollider);
 
                     if (collision) {
-                        aCollider.colliding = true;
-                        bCollider.colliding = true;
                         spdlog::info("Collision Happened!");
+                        eventBus->EmitEvent<CollisionEvent>(a, b);
                     };
                 }
             } 

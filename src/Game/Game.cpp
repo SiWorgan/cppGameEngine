@@ -12,17 +12,21 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
+//Systems
+#include "../Systems/DamageSystem.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
+//Util
 #include "../Utilities/TileMapLoader.h"
 
 Game::Game() {
     isRunning = false;
     registry = std::make_unique<Registry>();
     assetStore = std::make_unique<AssetStore>();
+    eventBus = std::make_unique<EventBus>();
     spdlog::info("Constructor called");
 }
 
@@ -82,6 +86,7 @@ void Game::LoadLevel(int level) {
     registry->AddSystem<AnimationSystem>();
     registry->AddSystem<CollisionSystem>();
     registry->AddSystem<RenderCollisionSystem>();
+    registry->AddSystem<DamageSystem>();
 
     //Add assets to the asset store
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -138,12 +143,18 @@ void Game::Update() {
 
     double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 
-    millisecsPreviousFrame = SDL_GetTicks(); 
+    millisecsPreviousFrame = SDL_GetTicks();
+
+    // Reset all event handlers
+    eventBus->Reset();
+
+    //Perform subscription of events - need a better way to do this
+    registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 
     //invoke all the systems that need to update
     registry->GetSystem<MovementSystem>().Update(deltaTime);
     registry->GetSystem<AnimationSystem>().Update(deltaTime);
-    registry->GetSystem<CollisionSystem>().Update();
+    registry->GetSystem<CollisionSystem>().Update(eventBus);
     // DamageSystem.Update();
 
     // Process entities waiting to be created/destroyed

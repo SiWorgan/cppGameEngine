@@ -29,11 +29,11 @@ class RenderCollisionSystem: public System {
                     static_cast<int>(collider.height)
                 };
                 
-                if (collider.colliding) {
-                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //Red
-                } else {
+                //if (collider.colliding) {
+                //    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //Red
+                //} else {
                     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); //Yellow
-                };
+                //};
 
                 SDL_RenderDrawRect(
                     renderer,
