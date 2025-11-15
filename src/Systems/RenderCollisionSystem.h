@@ -7,13 +7,22 @@
 #include "../ECS/ECS.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TransformComponent.h"
-
+#include "../EventBus/EventBus.h"
+#include "../Events/CollisionEvent.h"
 
 class RenderCollisionSystem: public System {
     public:
         RenderCollisionSystem() {
             RequireComponent<BoxColliderComponent>();
             RequireComponent<TransformComponent>();
+        }
+
+        void SubscribeToEvents(std::unique_ptr<EventBus>& eventBus) {
+            eventBus->SubscribeToEvent<CollisionEvent>(this, &RenderCollisionSystem::onCollision);
+        }
+
+        void onCollision(CollisionEvent& event) {
+            drawColour[1] = 0; //Red
         }
 
         void Update(SDL_Renderer* renderer) {
@@ -29,11 +38,7 @@ class RenderCollisionSystem: public System {
                     static_cast<int>(collider.height)
                 };
                 
-                //if (collider.colliding) {
-                //    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //Red
-                //} else {
-                    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); //Yellow
-                //};
+                SDL_SetRenderDrawColor(renderer, drawColour[0], drawColour[1], drawColour[2], drawColour[3]); //Yellow
 
                 SDL_RenderDrawRect(
                     renderer,
@@ -41,8 +46,14 @@ class RenderCollisionSystem: public System {
                 );
 
             }
-
+            //Set back to Yellow
+            drawColour[1] = 255;
         }
+
+        private:
+            int drawColour[4] = {255, 255, 0, 255}; //Yellow
+
+
 };
 
 #endif

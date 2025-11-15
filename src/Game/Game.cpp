@@ -19,6 +19,7 @@
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
+#include "../Systems/KeyboardMovementSystem.h"
 //Util
 #include "../Utilities/TileMapLoader.h"
 
@@ -74,6 +75,7 @@ void Game::ProcessInput() {
                 if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
                     isRunning = false;
                 }
+                eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
                 break;
         }
     }
@@ -87,6 +89,7 @@ void Game::LoadLevel(int level) {
     registry->AddSystem<CollisionSystem>();
     registry->AddSystem<RenderCollisionSystem>();
     registry->AddSystem<DamageSystem>();
+    registry->AddSystem<KeyboardMovementSystem>();
 
     //Add assets to the asset store
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -127,11 +130,13 @@ void Game::LoadLevel(int level) {
 
     //Load the map
     TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", 25, 25, 32, 4.0f, registry.get(), assetStore.get());
-
 }
 
 void Game::Setup() {
     LoadLevel(1);
+    registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+    registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
+    registry->GetSystem<RenderCollisionSystem>().SubscribeToEvents(eventBus);
 }
 
 void Game::Update() {
@@ -144,12 +149,6 @@ void Game::Update() {
     double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 
     millisecsPreviousFrame = SDL_GetTicks();
-
-    // Reset all event handlers
-    eventBus->Reset();
-
-    //Perform subscription of events - need a better way to do this
-    registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 
     //invoke all the systems that need to update
     registry->GetSystem<MovementSystem>().Update(deltaTime);
