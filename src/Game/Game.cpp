@@ -11,7 +11,9 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Components/KeyboardControlComponent.h"
 #include "../Components/BoxColliderComponent.h"
+#include "../Components/CameraFollowComponent.h"
 //Systems
 #include "../Systems/DamageSystem.h"
 #include "../Systems/MovementSystem.h"
@@ -20,8 +22,14 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/KeyboardMovementSystem.h"
+#include "../Systems/CameraMovementSystem.h"
 //Util
 #include "../Utilities/TileMapLoader.h"
+
+int Game::windowWidth;
+int Game::windowHeight;
+int Game::mapWidth;
+int Game::mapHeight;
 
 Game::Game() {
     isRunning = false;
@@ -61,6 +69,12 @@ void Game::Initialize() {
     }
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
+    // Initiatlise camera
+    camera.x = 0;
+    camera.y = 0;
+    camera.w = windowWidth;
+    camera.h = windowHeight;
+
     isRunning = true;
 }
 
@@ -90,21 +104,25 @@ void Game::LoadLevel(int level) {
     registry->AddSystem<RenderCollisionSystem>();
     registry->AddSystem<DamageSystem>();
     registry->AddSystem<KeyboardMovementSystem>();
+    registry->AddSystem<CameraMovementSystem>();
 
     //Add assets to the asset store
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
-    assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+    assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->AddTexture(renderer, "jungle-map", "./assets/tilemaps/jungle.png");
 
     //Create Entity
     Entity chopper = registry->CreateEntity();
     //Add some components
-    //chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
-    //chopper.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0));
-    //chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
-    //chopper.AddComponent<AnimationComponent>(2, 10, true);
+    chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
+    chopper.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0));
+    chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
+    chopper.AddComponent<AnimationComponent>(2, 10, true);
+    chopper.AddComponent<KeyboardControlComponent>(glm::vec2(0, -20), glm::vec2(20, 0), 
+                                                   glm::vec2(0, 20), glm::vec2(-20, 0));
+    chopper.AddComponent<CameraFollowComponent>();
     
     //Create Entity
     Entity tank = registry->CreateEntity();
@@ -125,11 +143,19 @@ void Game::LoadLevel(int level) {
     Entity radar = registry->CreateEntity();
     radar.AddComponent<TransformComponent>(glm::vec2(windowWidth-74.0, windowHeight-10.0), glm::vec2(1.0,1.0), 0.0);
     radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0));
-    radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
+    radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.AddComponent<AnimationComponent>(8, 5, true);
 
+    int mapNumRows = 25;
+    int mapNumCols = 25;
+    int tileSize = 32;
+    float tileScale = 4.0f;
+
     //Load the map
-    TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", 25, 25, 32, 4.0f, registry.get(), assetStore.get());
+    TileMapLoader::LoadMap("./assets/tilemaps/jungle.map", mapNumRows, mapNumCols, tileSize, tileScale, registry.get(), assetStore.get());
+    mapWidth = mapNumCols * tileSize * tileScale;
+    mapHeight = mapNumRows * tileSize * tileScale;
+
 }
 
 void Game::Setup() {
@@ -154,6 +180,7 @@ void Game::Update() {
     registry->GetSystem<MovementSystem>().Update(deltaTime);
     registry->GetSystem<AnimationSystem>().Update(deltaTime);
     registry->GetSystem<CollisionSystem>().Update(eventBus);
+    registry->GetSystem<CameraMovementSystem>().Update(camera);
     // DamageSystem.Update();
 
     // Process entities waiting to be created/destroyed
@@ -166,8 +193,8 @@ void Game::Render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
     
-    registry->GetSystem<RenderSystem>().Update(renderer, *assetStore);
-    registry->GetSystem<RenderCollisionSystem>().Update(renderer);
+    registry->GetSystem<RenderSystem>().Update(renderer, *assetStore, camera);
+    registry->GetSystem<RenderCollisionSystem>().Update(renderer, camera);
 
     SDL_RenderPresent(renderer);
 
@@ -183,6 +210,7 @@ void Game::Run() {
 }
 
 void Game::Destroy() {
+    eventBus->Reset();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

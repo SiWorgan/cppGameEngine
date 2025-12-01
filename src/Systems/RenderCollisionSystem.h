@@ -25,17 +25,17 @@ class RenderCollisionSystem: public System {
             drawColour[1] = 0; //Red
         }
 
-        void Update(SDL_Renderer* renderer) {
+        void Update(SDL_Renderer* renderer, SDL_Rect& camera) {
             auto entities = GetSystemEntities();
             for (auto entity: entities) {
                 const TransformComponent& transform = entity.GetComponent<TransformComponent>();
                 const BoxColliderComponent& collider = entity.GetComponent<BoxColliderComponent>();
 
                 SDL_Rect renderRect = {
-                    static_cast<int>(transform.position.x + collider.offset.x),
-                    static_cast<int>(transform.position.y + collider.offset.y),
-                    static_cast<int>(collider.width),
-                    static_cast<int>(collider.height)
+                    static_cast<int>(transform.position.x + collider.offset.x - camera.x),
+                    static_cast<int>(transform.position.y + collider.offset.y - camera.y),
+                    static_cast<int>(collider.width * transform.scale.x),
+                    static_cast<int>(collider.height * transform.scale.y)
                 };
                 
                 SDL_SetRenderDrawColor(renderer, drawColour[0], drawColour[1], drawColour[2], drawColour[3]); //Yellow
