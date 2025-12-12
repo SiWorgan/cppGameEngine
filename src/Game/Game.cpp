@@ -14,6 +14,7 @@
 #include "../Components/KeyboardControlComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/CameraFollowComponent.h"
+#include "../Components/ProjectileEmitterComponent.h"
 //Systems
 #include "../Systems/DamageSystem.h"
 #include "../Systems/MovementSystem.h"
@@ -23,6 +24,7 @@
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/KeyboardMovementSystem.h"
 #include "../Systems/CameraMovementSystem.h"
+#include "../Systems/ProjectileEmitSystem.h"
 //Util
 #include "../Utilities/TileMapLoader.h"
 
@@ -105,6 +107,7 @@ void Game::LoadLevel(int level) {
     registry->AddSystem<DamageSystem>();
     registry->AddSystem<KeyboardMovementSystem>();
     registry->AddSystem<CameraMovementSystem>();
+    registry->AddSystem<ProjectileEmitSystem>();
 
     //Add assets to the asset store
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -112,6 +115,7 @@ void Game::LoadLevel(int level) {
     assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->AddTexture(renderer, "jungle-map", "./assets/tilemaps/jungle.png");
+    assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
 
     //Create Entity
     Entity chopper = registry->CreateEntity();
@@ -131,6 +135,7 @@ void Game::LoadLevel(int level) {
     tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0));
     tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
     tank.AddComponent<BoxColliderComponent>(32, 32);
+    tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 1000, 10000, 0, false);
 
     //Create Entity
     Entity truck = registry->CreateEntity();
@@ -181,6 +186,7 @@ void Game::Update() {
     registry->GetSystem<AnimationSystem>().Update(deltaTime);
     registry->GetSystem<CollisionSystem>().Update(eventBus);
     registry->GetSystem<CameraMovementSystem>().Update(camera);
+    registry->GetSystem<ProjectileEmitSystem>().Update(registry);
     // DamageSystem.Update();
 
     // Process entities waiting to be created/destroyed
