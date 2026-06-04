@@ -54,6 +54,13 @@ class Entity {
         bool operator >(const Entity& other) const { return id > other.id; } 
         bool operator >=(const Entity& other) const { return id >= other.id; } 
 
+        // Tag and Group management
+        void AddTag(const std::string& tag);
+        void AddGroup(const std::string& group);
+        bool HasTag(const std::string& tag) const;
+        bool InGroup(const std::string& group) const;
+        
+        // Component Management
         template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
         template <typename TComponent> void RemoveComponent();
         template <typename TComponent> bool HasComponent() const;
@@ -103,6 +110,14 @@ class Registry {
         std::set<Entity> entitiesToBeAdded;
         std::set<Entity> entitiesToBeKilled;
 
+        // Entity Tags
+        std::unordered_map<std::string, Entity> entityPerTag;
+        std::unordered_map<int, std::string> tagPerEntity;
+
+        // Entity Groups
+        std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
+        std::unordered_map<int, std::set<std::string>> groupPerEntity;
+
         std::deque<int> freeIds;
 
     public:
@@ -119,6 +134,18 @@ class Registry {
         void KillEntity(Entity entity);
         void Update();
         void AddEntityToSystem(Entity entity);
+
+        // Entity Tag management
+        void TagEntity(Entity entity, const std::string& tag);
+        void UntagEntity(Entity entity);
+        bool IsEntityTagged(Entity entity, const std::string& tag) const;
+        Entity GetEntityByTag(const std::string& tag) const;
+
+        // Entity Group management
+        void AddEntityToGroup(Entity entity, const std::string& group);
+        void RemoveEntityFromGroup(Entity entity);
+        bool IsEntityInGroup(Entity entity, const std::string& group) const;
+        std::set<Entity> GetEntitiesByGroup(const std::string& group) const;
 
         // Component management
         template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);

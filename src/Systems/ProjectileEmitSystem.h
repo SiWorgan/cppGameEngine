@@ -57,7 +57,7 @@ class ProjectileEmitSystem: public System {
             }
         }
 
-        void _emitProjectile(Entity* entity, auto& projectileEmitter) {
+        void _emitProjectile(Entity* entity, ProjectileEmitterComponent& projectileEmitter) {
             const auto& transform = entity->GetComponent<TransformComponent>();
             glm::vec2 projectilePosition = transform.position;
             if (entity->HasComponent<SpriteComponent>()) {

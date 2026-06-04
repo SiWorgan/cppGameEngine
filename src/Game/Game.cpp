@@ -123,6 +123,7 @@ void Game::LoadLevel(int level) {
 
     //Create Entity
     Entity chopper = registry->CreateEntity();
+    chopper.AddTag("player");
     //Add some components
     chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
     chopper.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0));
@@ -139,6 +140,7 @@ void Game::LoadLevel(int level) {
     
     //Create Entity
     Entity tank = registry->CreateEntity();
+    tank.AddGroup("enemies");
     //Add some components
     tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0,1.0), 0.0);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0));
@@ -149,6 +151,7 @@ void Game::LoadLevel(int level) {
 
     //Create Entity
     Entity truck = registry->CreateEntity();
+    truck.AddGroup("enemies");
     //Add some components
     truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0,1.0), 0.0);
     truck.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0));

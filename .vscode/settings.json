@@ -4,6 +4,11 @@
             "cwd": "/home/simon/GitHub/cppGameEngine",
             "binaryPath": "/home/simon/GitHub/cppGameEngine/gameengine",
             "binaryArgs": []
+        },
+        {
+            "cwd": "/Users/SWorgan/Documents/GitHub/cppGameEngine",
+            "binaryPath": "/Users/SWorgan/Documents/GitHub/cppGameEngine/gameengine",
+            "binaryArgs": []
         }
     ]
 }

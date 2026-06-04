@@ -2,13 +2,14 @@
 CC = g++
 LANG_STD = -std=c++17
 COMPILER_FLAGS = -Wall -Wfatal-errors
-INCLUDE_PATH = -I"./libs"
+INCLUDE_PATH = -I"./libs" -I/opt/homebrew/include -I/opt/homebrew/opt/lua@5.4/include/lua5.4
+LIB_PATH = -L/opt/homebrew/lib -L/opt/homebrew/opt/lua@5.4/lib
 SRC_FILES = ./src/*.cpp ./src/**/*.cpp
-LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua5.3 
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua5.4 -lspdlog -lfmt
 OBJ_NAME = gameengine
 
 build:
-	$(CC) $(COMPILER_FLAGS) $(LANG_STD) $(INCLUDE_PATH) $(SRC_FILES) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) $(COMPILER_FLAGS) $(LANG_STD) $(INCLUDE_PATH) $(SRC_FILES) $(LIB_PATH) $(LINKER_FLAGS) -o $(OBJ_NAME)
 
 run:
 	./$(OBJ_NAME)
