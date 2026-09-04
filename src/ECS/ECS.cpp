@@ -111,7 +111,6 @@ void Registry::UntagEntity(Entity entity) {
     }
 }
 
-// Check this works
 bool Registry::IsEntityTagged(Entity entity, const std::string& tag) const {
     auto taggedEntity = entityPerTag.find(tag);
     return taggedEntity != entityPerTag.end() && taggedEntity->second == entity;
@@ -127,14 +126,20 @@ void Registry::AddEntityToGroup(Entity entity, const std::string& group) {
 }
 
 bool Registry::IsEntityInGroup(Entity entity, const std::string& group) const {
-    auto groupEntities = entitiesPerGroup.at(group);
-    // end is null
-    return groupEntities.find(entity.GetId()) != groupEntities.end();
+    auto it = entitiesPerGroup.find(group);
+    if (it == entitiesPerGroup.end()) {
+        return false;
+    }
+    auto& groupEntities = it->second;
+    return groupEntities.find(entity) != groupEntities.end();
 }
 
 std::vector<Entity> Registry::GetEntitiesByGroup(const std::string& group) const {
-    auto& setOfEntities = entitiesPerGroup.at(group);
-    return std::vector<Entity>(setOfEntities.begin(), setOfEntities.end());
+    auto it = entitiesPerGroup.find(group);
+    if (it == entitiesPerGroup.end()) {
+        return {};
+    }
+    return std::vector<Entity>(it->second.begin(), it->second.end());
 }
 
 void Registry::RemoveEntityFromGroup(Entity entity) {
@@ -167,6 +172,9 @@ void Registry::Update() {
         entityComponentSignatures[entity.GetId()].reset();
         //Make the entity id available to be reused
         freeIds.push_back(entity.GetId());
+        // Remove the entity from all groups it belongs to
+        UntagEntity(entity);
+        RemoveEntityFromGroup(entity);
     }
     entitiesToBeKilled.clear();
 }
