@@ -145,7 +145,7 @@ class Registry {
         void AddEntityToGroup(Entity entity, const std::string& group);
         void RemoveEntityFromGroup(Entity entity);
         bool IsEntityInGroup(Entity entity, const std::string& group) const;
-        std::set<Entity> GetEntitiesByGroup(const std::string& group) const;
+        std::vector<Entity> GetEntitiesByGroup(const std::string& group) const;
 
         // Component management
         template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);

@@ -25,6 +25,7 @@ void TileMapLoader::LoadMap(const std::string& path, int mapNumRows, int mapNumC
             int srcRectX = (chX - '0') * tileSize;
 
             Entity tile = registry->CreateEntity();
+            tile.AddGroup("tiles");
             tile.AddComponent<TransformComponent>(
                 glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)),
                 glm::vec2(tileScale, tileScale)
