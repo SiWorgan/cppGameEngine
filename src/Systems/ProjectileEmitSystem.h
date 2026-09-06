@@ -72,6 +72,7 @@ class ProjectileEmitSystem: public System {
                 projectileVelocity = direction.direction * speed;
             }
             Entity projectile = registry->CreateEntity();
+            projectile.AddGroup("projectiles");
             projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
             projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
             projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
